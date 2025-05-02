@@ -1,0 +1,184 @@
+<!-- dia_da_mae_responsive.html  
+     Versão responsiva – fogo‑de‑artifício a cores (amarelo, laranja, vermelho).
+-->
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feliz Dia da Mãe!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* --------------------  VARIÁVEIS  -------------------- */
+    :root {
+      --blue-light: #d1e9ff;
+      --blue-medium: #6ec8ff;
+      --blue-dark: #187bff;
+      --white: #ffffff;
+      /* tons quentes para o fogo‑de‑artifício */
+      --yellow: #ffec99;
+      --orange: #ff9b4a;
+      --red: #ff4e4e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+    body {
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: radial-gradient(circle at top left, var(--blue-light), var(--blue-medium)); overflow-x: hidden;
+      padding: 1rem; /* afasta conteúdo das bordas em telemóveis */
+    }
+
+    h1 {
+      font-size: 3rem; color: var(--blue-dark); letter-spacing: 1.5px; text-shadow: 0 3px 6px rgba(0,0,0,.18);
+      user-select: none; animation: fadeSlide 1s ease-out forwards; opacity: 0; transform: translateY(-20px);
+    }
+    @keyframes fadeSlide { to {opacity: 1; transform: translateY(0);} }
+
+    /* --------------------  CARTÃO INTERACTIVO  -------------------- */
+    .card-wrapper { perspective: 1200px; margin: 2rem 0; }
+
+    .card { width: clamp(260px, 70vw, 340px); aspect-ratio: 16/10; position: relative; transform-style: preserve-3d;
+      transition: transform .9s cubic-bezier(.19,1,.22,1); cursor: pointer; }
+    .card.is-flipped { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute; inset: 0; border-radius: 20px; display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem; text-align: center; backface-visibility: hidden; color: var(--white);
+      font-size: 1.25rem; line-height: 1.4; box-shadow: 0 15px 25px rgba(0,0,0,.15);
+    }
+    .card-front { background: linear-gradient(135deg, var(--blue-medium), var(--blue-light)); color: #187bff;}
+    .card-back  { background: linear-gradient(135deg, var(--blue-dark), var(--blue-medium)); transform: rotateY(180deg); font-size: 1rem; white-space: pre-line; }
+    .card-tilt { transform: rotateX(var(--rx)) rotateY(var(--ry)); }
+
+    /* --------------------  BOTÃO  -------------------- */
+    .btn { margin-top: 1.8rem; padding: .9rem 2.1rem; font-size: 1.05rem; font-weight: 600;
+      border: none; border-radius: 9999px; color: var(--white); background: var(--blue-dark);
+      box-shadow: 0 10px 20px rgba(0,0,0,.15); cursor: pointer; transition: transform .18s, box-shadow .18s; }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 14px 24px rgba(0,0,0,.2); }
+
+    /* --------------------  CANVAS LAYERS  -------------------- */
+    canvas.layer { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    #fireworks-canvas { z-index: 1; }
+
+    /* ------------ MEDIA QUERIES ------------ */
+    @media (max-width: 768px) {
+      h1 { font-size: 2.25rem; }
+      .card { width: 80vw; }
+      .btn { font-size: 1rem; padding: .75rem 1.8rem; }
+    }
+    @media (max-width: 480px) {
+      h1 { font-size: 2rem; }
+      .card { width: 90vw; }
+      .card-face { font-size: 1rem; padding: 1.25rem; }
+      .btn { width: 100%; font-size: .95rem; }
+    }
+
+    /* Remover tilt em dispositivos de toque */
+    @media (pointer: coarse) {
+      .card-tilt { transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Confetti de fundo -->
+  <canvas id="confetti-canvas" class="layer"></canvas>
+  <!-- Fireworks por cima -->
+  <canvas id="fireworks-canvas" class="layer"></canvas>
+
+  <h1>Feliz Dia da Mãe</h1>
+
+  <div class="card-wrapper">
+    <div id="card" class="card" title="Clica para virar e mexe o rato">
+      <div class="card-face card-front">Ficava muito caro enviar um cartão de Trieste por isso este ano é digital</div>
+      <div class="card-face card-back">Mãe querida, querida Mãe, agradeço por meio de um site piroso por ser o reflexo vivo do amor de Nossa Senhora na minha vida. Em cada cuidado e em cada mimo. 
+Com muitas saudades,
+Francisco</div>
+    </div>
+  </div>
+
+  <button id="loveBtn" class="btn">Enviar Amor</button>
+
+  <script>
+    // ------------ VIRAR CARTÃO + INCLINAÇÃO -------------
+    const card = document.getElementById('card');
+    card.addEventListener('click', () => card.classList.toggle('is-flipped'));
+    const wrapper = document.querySelector('.card-wrapper');
+    if (matchMedia('(pointer:fine)').matches) {
+      wrapper.addEventListener('mousemove', e => {
+        const b = wrapper.getBoundingClientRect();
+        const x = e.clientX - b.left, y = e.clientY - b.top;
+        card.style.setProperty('--rx', -(y / b.height - .5) * 12 + 'deg');
+        card.style.setProperty('--ry',  (x / b.width  - .5) * 12 + 'deg');
+        card.classList.add('card-tilt');
+      });
+      wrapper.addEventListener('mouseleave', () => {
+        card.classList.remove('card-tilt');
+        card.style.setProperty('--rx','0deg'); card.style.setProperty('--ry','0deg');
+      });
+    }
+
+    // ================================= CONFETTI (FUNDO) =================================
+    const confCanvas = document.getElementById('confetti-canvas');
+    const confCtx = confCanvas.getContext('2d');
+    let confettiPieces = []; let numberOfPieces = innerWidth < 600 ? 80 : 120;
+    function resizeConfetti() { confCanvas.width = innerWidth; confCanvas.height = innerHeight; }
+    addEventListener('resize', resizeConfetti); resizeConfetti();
+    function initConfetti() {
+      confettiPieces = [];
+      for (let i = 0; i < numberOfPieces; i++) {
+        confettiPieces.push({ x: Math.random()*confCanvas.width, y: Math.random()*-confCanvas.height,
+          w: 10, h: 20, r: Math.random()*360, s: Math.random()*3+2, d: Math.random()*45,
+          color: `hsl(${Math.random()*360},80%,60%)` });
+      }
+    }
+    function drawConfetti(p){ confCtx.save(); confCtx.translate(p.x,p.y); confCtx.rotate(p.r*Math.PI/180);
+      confCtx.fillStyle=p.color; confCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h); confCtx.restore(); }
+    function updateConfetti(){ confCtx.clearRect(0,0,confCanvas.width,confCanvas.height);
+      confettiPieces.forEach(p=>{ p.y+=p.s; p.r+=p.d; if(p.y>confCanvas.height) p.y=-p.h; drawConfetti(p); });
+      requestAnimationFrame(updateConfetti);
+    }
+    initConfetti(); updateConfetti();
+
+    // ================================= FIREWORKS (BUTTON) =================================
+    const fwCanvas = document.getElementById('fireworks-canvas');
+    const fwCtx = fwCanvas.getContext('2d');
+    function resizeFW(){ fwCanvas.width=innerWidth; fwCanvas.height=innerHeight; }
+    addEventListener('resize', resizeFW); resizeFW();
+
+    class Particle {
+      constructor(x,y,color){ this.x=x; this.y=y; const angle=Math.random()*Math.PI*2;
+        const speed=Math.random()*3+2; this.vx=Math.cos(angle)*speed; this.vy=Math.sin(angle)*speed;
+        this.alpha=1; this.decay=Math.random()*0.015+0.007; this.color=color; }
+      update(){ this.x+=this.vx; this.y+=this.vy; this.vy+=0.02; this.alpha-=this.decay; }
+      draw(ctx){ ctx.save(); ctx.globalAlpha=this.alpha; ctx.fillStyle=this.color; ctx.beginPath(); ctx.arc(this.x,this.y,3,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+    }
+    let particles=[];
+
+    // Obter as cores CSS vars como strings RGB/HEX válidas para canvas
+    const rootStyles = getComputedStyle(document.documentElement);
+    const palette = [rootStyles.getPropertyValue('--yellow').trim(),
+                     rootStyles.getPropertyValue('--orange').trim(),
+                     rootStyles.getPropertyValue('--red').trim()];
+
+    function burst(x,y){
+      for(let i=0;i<40;i++) particles.push(new Particle(x,y,palette[Math.floor(Math.random()*palette.length)]));
+    }
+
+    function animateFW(){ fwCtx.clearRect(0,0,fwCanvas.width,fwCanvas.height);
+      particles.forEach((p,i)=>{ p.update(); p.draw(fwCtx); if(p.alpha<=0) particles.splice(i,1); });
+      requestAnimationFrame(animateFW);
+    }
+    animateFW();
+
+    const loveBtn=document.getElementById('loveBtn');
+    loveBtn.addEventListener('click',()=>{
+      for(let i=0;i<5;i++){
+        const x=Math.random()*fwCanvas.width*0.8+fwCanvas.width*0.1;
+        const y=Math.random()*fwCanvas.height*0.4+fwCanvas.height*0.1;
+        burst(x,y);
+      }
+    });
+  </script>
+</body>
+</html>
