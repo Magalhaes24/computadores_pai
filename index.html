@@ -1,5 +1,8 @@
 <!-- dia_da_mae_responsive.html  
-     Fireworks Boosted – partículas maiores, efeito glow e mistura aditiva para serem mais visíveis.
+     MOBILE FIRST ✨
+     – Interface repensada para telemóveis: tamanhos fluidos, espaçamento adicional, menos partículas e CPU‑friendly.
+     – Usa clamp() nos tamanhos de letra, autoscroll seguro e botão full‑width.
+     – Cancela animações quando o utilizador activa "reduzir movimento".
 -->
 <!DOCTYPE html>
 <html lang="pt">
@@ -21,40 +24,77 @@
       --red: #ff4e4e;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    /* Reset & fonte */
+    *,*:before,*:after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Poppins', sans-serif; }
 
+    /* --------------------  LAYOUT  -------------------- */
     body {
-      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      background: radial-gradient(circle at top left, var(--blue-light), var(--blue-medium)); overflow-x: hidden;
-      padding: 1rem; /* afasta conteúdo das bordas em telemóveis */
+      min-height: 100dvh; /* usa viewport real em iOS */
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: radial-gradient(circle at top left, var(--blue-light), var(--blue-medium));
+      padding: 1.2rem 0.8rem;
+      overflow-x: hidden;
     }
 
     h1 {
-      font-size: 3rem; color: var(--blue-dark); letter-spacing: 1.5px; text-shadow: 0 3px 6px rgba(0,0,0,.18);
-      user-select: none; animation: fadeSlide 1s ease-out forwards; opacity: 0; transform: translateY(-20px);
+      font-size: clamp(2rem, 6vw + .5rem, 3.2rem);
+      color: var(--blue-dark);
+      letter-spacing: 1.5px;
+      text-shadow: 0 3px 6px rgba(0,0,0,.18);
+      user-select: none;
+      animation: fadeSlide 1s ease-out forwards;
+      opacity: 0; transform: translateY(-20px);
+      text-align: center;
     }
-    @keyframes fadeSlide { to {opacity: 1; transform: translateY(0);} }
+    @keyframes fadeSlide { to { opacity: 1; transform: translateY(0);} }
 
     /* --------------------  CARTÃO INTERACTIVO  -------------------- */
-    .card-wrapper { perspective: 1200px; margin: 2rem 0; }
+    .card-wrapper { perspective: 1200px; margin-block: clamp(1rem,4vh,2.4rem); }
 
-    .card { width: clamp(320px, 80vw, 460px); aspect-ratio: 16/10; position: relative; transform-style: preserve-3d;
-      transition: transform .9s cubic-bezier(.19,1,.22,1); cursor: pointer; }
+    .card {
+      width: clamp(300px, 90vw, 480px);
+      aspect-ratio: 16/10;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform .9s cubic-bezier(.19,1,.22,1);
+      cursor: pointer;
+    }
     .card.is-flipped { transform: rotateY(180deg); }
 
     .card-face {
-      position: absolute; inset: 0; border-radius: 20px; display: flex; align-items: center; justify-content: center;
-      padding: 1.5rem; text-align: center; backface-visibility: hidden; color: var(--white);
-      font-size: 1.35rem; line-height: 1.45; box-shadow: 0 15px 25px rgba(0,0,0,.15);
+      position: absolute; inset: 0;
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      padding: clamp(1rem,4vw,1.6rem);
+      text-align: center;
+      backface-visibility: hidden;
+      color: var(--white);
+      font-size: clamp(1rem, 3.5vw, 1.35rem);
+      line-height: 1.45;
+      box-shadow: 0 15px 25px rgba(0,0,0,.15);
     }
     .card-front { background: linear-gradient(135deg, var(--blue-medium), var(--blue-light)); color: #187bff; }
-    .card-back  { background: linear-gradient(135deg, var(--blue-dark), var(--blue-medium)); transform: rotateY(180deg); font-size: 1.15rem; white-space: pre-line; }
+    .card-back  { background: linear-gradient(135deg, var(--blue-dark), var(--blue-medium)); transform: rotateY(180deg); white-space: pre-line; }
     .card-tilt { transform: rotateX(var(--rx)) rotateY(var(--ry)); }
 
     /* --------------------  BOTÃO  -------------------- */
-    .btn { margin-top: 1.8rem; padding: .9rem 2.4rem; font-size: 1.1rem; font-weight: 600;
-      border: none; border-radius: 9999px; color: var(--white); background: var(--blue-dark);
-      box-shadow: 0 10px 20px rgba(0,0,0,.15); cursor: pointer; transition: transform .18s, box-shadow .18s; }
+    .btn {
+      margin-top: clamp(1.2rem,4vh,1.8rem);
+      padding: .9rem 2.4rem;
+      font-size: clamp(1rem,3vw,1.1rem);
+      font-weight: 600;
+      border: none;
+      border-radius: 9999px;
+      color: var(--white);
+      background: var(--blue-dark);
+      box-shadow: 0 10px 20px rgba(0,0,0,.15);
+      cursor: pointer;
+      transition: transform .18s, box-shadow .18s;
+      width: 100%; /* melhor tap target */
+      max-width: 420px;
+    }
     .btn:hover { transform: translateY(-3px); box-shadow: 0 14px 24px rgba(0,0,0,.2); }
 
     /* --------------------  CANVAS LAYERS  -------------------- */
@@ -62,48 +102,46 @@
     #fireworks-canvas { z-index: 1; }
 
     /* ------------ MEDIA QUERIES ------------ */
-    @media (max-width: 768px) {
-      h1 { font-size: 2.5rem; }
-      .card { width: 85vw; }
-      .btn { font-size: 1.05rem; padding: .8rem 2.1rem; }
-    }
-    @media (max-width: 480px) {
-      h1 { font-size: 2.1rem; }
-      .card { width: 95vw; }
-      .card-face { font-size: 1.05rem; padding: 1.25rem; }
-      .btn { width: 100%; font-size: 1rem; }
+    @media (min-width: 600px) {
+      .btn { width: auto; }
     }
 
     /* Remover tilt em dispositivos de toque */
     @media (pointer: coarse) {
       .card-tilt { transform: none !important; }
     }
+
+    /* Acessibilidade – reduzir movimento */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
   </style>
 </head>
 <body>
   <!-- Confetti de fundo -->
-  <canvas id="confetti-canvas" class="layer"></canvas>
+  <canvas id="confetti-canvas" class="layer" aria-hidden="true"></canvas>
   <!-- Fireworks por cima -->
-  <canvas id="fireworks-canvas" class="layer"></canvas>
+  <canvas id="fireworks-canvas" class="layer" aria-hidden="true"></canvas>
 
   <h1>Feliz Dia da Mãe</h1>
 
   <div class="card-wrapper">
-    <div id="card" class="card" title="Clica para virar e mexe o rato">
+    <div id="card" class="card" title="Clica para virar">
       <div class="card-face card-front">Ficava muito caro enviar um cartão de Trieste por isso este ano é digital</div>
-      <div class="card-face card-back">Mãe querida, querida Mãe, agradeço por meio de um site piroso por ser o reflexo vivo do amor de Maria na minha vida. 
-Em cada cuidado e em cada mimo. 
+      <div class="card-face card-back">Mãe querida, querida Mãe, agradeço por meio de um site piroso por ser o reflexo vivo do amor de Maria na minha vida.
+Em cada cuidado e em cada mimo.
 Com muitas saudades,
 Francisco</div>
     </div>
   </div>
 
-  <button id="loveBtn" class="btn">Enviar Amor</button>
+  <button id="loveBtn" class="btn">Enviar Amor</button>
 
   <script>
-    // ------------ VIRAR CARTÃO + INCLINAÇÃO -------------
+    /* -------------- CARD: flip + tilt -------------- */
     const card = document.getElementById('card');
     card.addEventListener('click', () => card.classList.toggle('is-flipped'));
+
     const wrapper = document.querySelector('.card-wrapper');
     if (matchMedia('(pointer:fine)').matches) {
       wrapper.addEventListener('mousemove', e => {
@@ -119,62 +157,85 @@ Francisco</div>
       });
     }
 
-    // ================================= CONFETTI (FUNDO) =================================
+    /* -------- CONFETTI (FUNDO) -------- */    
     const confCanvas = document.getElementById('confetti-canvas');
     const confCtx = confCanvas.getContext('2d');
-    let confettiPieces = []; let numberOfPieces = innerWidth < 600 ? 80 : 120;
-    function resizeConfetti() { confCanvas.width = innerWidth; confCanvas.height = innerHeight; }
-    addEventListener('resize', resizeConfetti); resizeConfetti();
+    let confettiPieces = [];
+
+    function confettiDensity() { return innerWidth < 500 ? 70 : 80; }
+
+    function resizeConfetti() {
+      confCanvas.width = innerWidth; confCanvas.height = innerHeight;
+      initConfetti();
+    }
+    addEventListener('resize', resizeConfetti);
+
     function initConfetti() {
       confettiPieces = [];
+      const numberOfPieces = confettiDensity();
       for (let i = 0; i < numberOfPieces; i++) {
-        confettiPieces.push({ x: Math.random()*confCanvas.width, y: Math.random()*-confCanvas.height,
-          w: 10, h: 20, r: Math.random()*360, s: Math.random()*3+2, d: Math.random()*45,
-          color: `hsl(${Math.random()*360},80%,60%)` });
+        confettiPieces.push({
+          x: Math.random()*confCanvas.width,
+          y: Math.random()*-confCanvas.height,
+          w: 9, h: 18,
+          r: Math.random()*360,
+          s: Math.random()*2+1,
+          d: Math.random()*30,
+          color: `hsl(${Math.random()*360},65%,70%)`
+        });
       }
     }
-    function drawConfetti(p){ confCtx.save(); confCtx.translate(p.x,p.y); confCtx.rotate(p.r*Math.PI/180);
-      confCtx.fillStyle=p.color; confCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h); confCtx.restore(); }
-    function updateConfetti(){ confCtx.clearRect(0,0,confCanvas.width,confCanvas.height);
-      confettiPieces.forEach(p=>{ p.y+=p.s; p.r+=p.d; if(p.y>confCanvas.height) p.y=-p.h; drawConfetti(p); });
+    function drawConfetti(p){
+      confCtx.save();
+      confCtx.globalAlpha = 0.4;
+      confCtx.translate(p.x,p.y);
+      confCtx.rotate(p.r*Math.PI/180);
+      confCtx.fillStyle=p.color;
+      confCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      confCtx.restore();
+    }
+    function updateConfetti(){
+      confCtx.clearRect(0,0,confCanvas.width,confCanvas.height);
+      confettiPieces.forEach(p=>{
+        p.y+=p.s; p.r+=p.d;
+        if(p.y>confCanvas.height) p.y=-p.h;
+        drawConfetti(p);
+      });
       requestAnimationFrame(updateConfetti);
     }
-    initConfetti(); updateConfetti();
-
-    // ================================= FIREWORKS (BUTTON) =================================
+    resizeConfetti(); updateConfetti();
+    
+    /* -------- FIREWORKS -------- */
     const fwCanvas = document.getElementById('fireworks-canvas');
     const fwCtx = fwCanvas.getContext('2d');
-    fwCtx.globalCompositeOperation = 'lighter'; // mistura aditiva
+    fwCtx.globalCompositeOperation = 'lighter';
+
     function resizeFW(){ fwCanvas.width=innerWidth; fwCanvas.height=innerHeight; }
     addEventListener('resize', resizeFW); resizeFW();
 
     class Particle {
       constructor(x,y,color){
-        this.x=x; this.y=y; const angle=Math.random()*Math.PI*2;
-        const speed=Math.random()*4+4; // mais rápido
-        this.vx=Math.cos(angle)*speed; this.vy=Math.sin(angle)*speed;
-        this.r = Math.random()*3+3; // raio 3‑6px
-        this.alpha=1; this.decay=Math.random()*0.012+0.005; this.color=color;
+        const angle=Math.random()*Math.PI*2;
+        const speed=Math.random()*3+2.5;
+        this.x=x; this.y=y; this.vx=Math.cos(angle)*speed; this.vy=Math.sin(angle)*speed;
+        this.r=Math.random()*3+3; this.alpha=1; this.decay=Math.random()*0.012+0.005; this.color=color;
       }
       update(){ this.x+=this.vx; this.y+=this.vy; this.vy+=0.03; this.alpha-=this.decay; }
       draw(ctx){ ctx.save(); ctx.globalAlpha=this.alpha; ctx.fillStyle=this.color;
-        ctx.shadowBlur=12; ctx.shadowColor=this.color; // glow
-        ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+        ctx.shadowBlur=10; ctx.shadowColor=this.color; ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill(); ctx.restore(); }
     }
     let particles=[];
 
-    const rootStyles = getComputedStyle(document.documentElement);
-    const palette = [rootStyles.getPropertyValue('--yellow').trim(),
-                     rootStyles.getPropertyValue('--orange').trim(),
-                     rootStyles.getPropertyValue('--red').trim()];
+    const css = getComputedStyle(document.documentElement);
+    const palette = [css.getPropertyValue('--yellow').trim(), css.getPropertyValue('--orange').trim(), css.getPropertyValue('--red').trim()];
 
     function burst(x,y){
-      const count = innerWidth < 600 ? 45 : 75; // mais partículas nos ecrãs grandes
-      for(let i=0;i<count;i++)
-        particles.push(new Particle(x,y,palette[Math.floor(Math.random()*palette.length)]));
+      const count = innerWidth < 500 ? 45 : 70;
+      for(let i=0;i<count;i++) particles.push(new Particle(x,y,palette[Math.floor(Math.random()*palette.length)]));
     }
 
-    function animateFW(){ fwCtx.clearRect(0,0,fwCanvas.width,fwCanvas.height);
+    function animateFW(){
+      fwCtx.clearRect(0,0,fwCanvas.width,fwCanvas.height);
       particles.forEach((p,i)=>{ p.update(); p.draw(fwCtx); if(p.alpha<=0) particles.splice(i,1); });
       requestAnimationFrame(animateFW);
     }
@@ -182,7 +243,7 @@ Francisco</div>
 
     const loveBtn=document.getElementById('loveBtn');
     loveBtn.addEventListener('click',()=>{
-      for(let i=0;i<5;i++){
+      for(let i=0;i<4;i++){
         const x=Math.random()*fwCanvas.width*0.8+fwCanvas.width*0.1;
         const y=Math.random()*fwCanvas.height*0.4+fwCanvas.height*0.1;
         burst(x,y);
